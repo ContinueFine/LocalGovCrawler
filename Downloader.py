@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from urllib.request import urlretrieve
 from os import makedirs
 import os.path, time, re
+import requests
 
 test_files = {}
 
@@ -40,6 +41,10 @@ def download_file(url):
 
    try:
       print("download=", url)
+      ext = os.path.splitext(savepath)[1]
+      # URL末尾に拡張子が存在しない場合はhtmlファイルとして保存
+      if ext == "":
+          savepath += ".html"
       urlretrieve(url, savepath)
       time.sleep(1)
       return savepath
