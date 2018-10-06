@@ -7,7 +7,10 @@ from urllib.request import urlretrieve
 from os import makedirs
 import os.path, time, re
 import requests
+import cchardet
+import const
 
+const.DL_ROOT_NAME = "CrawlerDownload"
 test_files = {}
 
 def enum_links(html, base):
@@ -24,7 +27,7 @@ def enum_links(html, base):
 
 def download_file(url):
    o = urlparse(url)
-   savepathroot = "../" + "CrawlerDownload/"
+   savepathroot = "../" + const.DL_ROOT_NAME + "/"
    savepath = savepathroot + o.netloc + o.path
    if re.search(r"/$", savepath):
       savepath += "index.html"
@@ -59,17 +62,26 @@ def analize_html(url, root_url):
    test_files[savepath] = True
    print("analize_html=", url)
 
-   html = open(savepath, "r", encoding="utf-8").read()
+   if const.DL_ROOT_NAME in url:
+       with open(os.path.abspath(url), mode='rb') as f:
+           char_code = cchardet.detect(f.read())["encoding"]
+   else:
+       char_code = cchardet.detect(requests.get(url).content)["encoding"]
+   html = open(savepath, "r", encoding=char_code).read()
    links = enum_links(html, url)
    for link_url in links:
       if link_url.find(root_url) != 0:
-         if not re.search(r".css$", link_url): continue
+         if not re.search(r".css$", str(link_url)): continue
 
-      if re.search(r".(html|htm)$", link_url):
+      if re.search(r".(html|htm)$", str(link_url)):
          analize_html(link_url, root_url)
          continue
 
-      download_file(link_url)
+      link_url = download_file(link_url)
+
+      if re.search(r".(html|htm)$", str(link_url)):
+         analize_html(link_url, root_url)
+         continue
 
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
@@ -77,7 +89,7 @@ def is_ascii(s):
 def url_convert(url):
     if not is_ascii(url):
        parsed_link = urllib.parse.urlsplit(url)
-       # queryにascii以外の文字が含まれている場合)
+       # queryにascii以外の文字が含まれている場合
        parsed_link = parsed_link._replace(query=urllib.parse.quote(parsed_link.query))
        url = parsed_link.geturl()
     return url
