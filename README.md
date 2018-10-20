@@ -6,11 +6,11 @@
 使い方
 ------
 ### Downloader.py ###
-メインのソースコード
+メインのソースコード  
 指定したルートURLから、リンク先の全てのファイルをDLします。
 
 ### target_url_list.csv ###
-ルートURLを指定するリスト
-LocalGovernmentName：地方自治体名
-URL                ：ルートURL
-TargetFlag         ："1"に設定すると対象となる
+ルートURLを指定するリスト  
+LocalGovernmentName：地方自治体名  
+URL                ：ルートURL  
+TargetFlag         ："1"に設定すると対象となる  
