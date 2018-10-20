@@ -71,6 +71,7 @@ def analize_html(url, root_url):
    html = open(savepath, "r", encoding=char_code).read()
    links = enum_links(html, url)
    for link_url in links:
+      # 階層構造になっていないリンクかつCSSファイルでない場合は無視(※要修正)
       if link_url.find(root_url) != 0:
          if not re.search(r".css$", str(link_url)): continue
 
@@ -80,7 +81,7 @@ def analize_html(url, root_url):
 
       link_url = download_file(link_url)
 
-      if re.search(r".(html|htm)$", str(link_url)):
+      if not(re.search(const.DL_ROOT_NAME, str(link_url))) and (re.search(r".(html|htm)$", str(link_url))):
          analize_html(link_url, root_url)
          continue
 
@@ -100,10 +101,10 @@ if __name__ == "__main__":
    f = csv.DictReader(csv_file)
    for row in f:
        if row["TargetFlag"] == "1":
-           # テスト計測用(あとで消す)
+           # テスト計測用(※あとで消す)
            start = time.time()
            url = row["URL"]
            url_convert(url)
            analize_html(url, url)
-           # テスト計測用(あとで消す)
+           # テスト計測用(※あとで消す)
            print(row["LocalGovernmentName"] + ":" + str(time.time()-start))
