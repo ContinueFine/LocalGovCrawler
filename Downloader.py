@@ -9,6 +9,7 @@ import os.path, time, re
 import requests
 import cchardet
 import const
+import csv
 
 const.DL_ROOT_NAME = "CrawlerDownload"
 test_files = {}
@@ -95,8 +96,10 @@ def url_convert(url):
     return url
 
 if __name__ == "__main__":
-   url = "http://www.senkyo.metro.tokyo.jp/"
-
-   url_convert(url)
-
-   analize_html(url, url)
+   csv_file = open("target_url_list.csv", "r", encoding="ms932", errors="", newline="" )
+   f = csv.DictReader(csv_file)
+   for row in f:
+       if row["TargetFlag"] == "1":
+           url = row["URL"]
+           url_convert(url)
+           analize_html(url, url)
