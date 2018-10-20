@@ -100,6 +100,10 @@ if __name__ == "__main__":
    f = csv.DictReader(csv_file)
    for row in f:
        if row["TargetFlag"] == "1":
+           # テスト計測用(あとで消す)
+           start = time.time()
            url = row["URL"]
            url_convert(url)
            analize_html(url, url)
+           # テスト計測用(あとで消す)
+           print(row["LocalGovernmentName"] + ":" + str(time.time()-start))
