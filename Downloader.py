@@ -29,7 +29,8 @@ def enum_links(html, base):
 def download_file(url):
    o = urlparse(url)
    savepathroot = "../" + const.DL_ROOT_NAME + "/"
-   savepath = savepathroot + o.netloc + o.path
+   replace_path = re.sub(r'[\\|:|?|"|<|>|\|]', '-', o.path)
+   savepath = savepathroot + o.netloc + replace_path
    if re.search(r"/$", savepath):
       savepath += "index.html"
    savedir = os.path.dirname(savepath)
@@ -68,7 +69,7 @@ def analize_html(url, root_url):
            char_code = cchardet.detect(f.read())["encoding"]
    else:
        char_code = cchardet.detect(requests.get(url).content)["encoding"]
-   html = open(savepath, "r", encoding=char_code).read()
+   html = open(savepath, "r", encoding=char_code, errors='ignore').read()
    links = enum_links(html, url)
    for link_url in links:
       if link_url.find(root_url) != 0:
@@ -80,9 +81,10 @@ def analize_html(url, root_url):
 
       link_url = download_file(link_url)
 
-      if link_url.find(root_url) == 0 and re.search(r".(html|htm)$", str(link_url)):
-         analize_html(link_url, root_url)
-         continue
+      if link_url is not None:
+          if link_url.find(root_url) == 0 and re.search(r".(html|htm)$", str(link_url)):
+              analize_html(link_url, root_url)
+              continue
 
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
