@@ -73,7 +73,7 @@ def analize_html(url, root_url):
    links = enum_links(html, url)
    for link_url in links:
       if link_url.find(root_url) != 0:
-         if not re.search(r".css$", str(link_url)): continue
+         if not re.search(r".(css|pdf)$", str(link_url)): continue
 
       if re.search(r".(html|htm)$", str(link_url)):
          analize_html(link_url, root_url)
@@ -107,7 +107,9 @@ if __name__ == "__main__":
            url = row["URL"]
            url_convert(url)
            # ドメイン名までをルートURLとする
-           root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(url))
+           #root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(url))
+           # 階層パスまでをルートURLとする
+           root_url = os.path.dirname(url)
            analize_html(url, root_url)
            # テスト計測用(※あとで消す)
            print(row["LocalGovernmentName"] + ":" + str(time.time()-start))
