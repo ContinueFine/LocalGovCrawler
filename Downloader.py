@@ -11,6 +11,10 @@ import cchardet
 import const
 import csv
 
+import logging_config
+from logging import getLogger
+log = getLogger(__name__)
+
 const.DL_ROOT_NAME = "CrawlerDownload"
 test_files = {}
 
@@ -38,14 +42,14 @@ def download_file(url):
    if os.path.exists(savepath): return savepath
 
    if not os.path.exists(savedir):
-      print("mkdir=", savedir)
+      log.info("mkdir=" + savedir)
       try:
           makedirs(savedir)
       except FileNotFoundError:
-          print("ディレクトリ作成失敗:", savedir)
+          log.warning("ディレクトリ作成失敗:" + savedir)
 
    try:
-      print("download=", url)
+      log.info("download=" + url)
       ext = os.path.splitext(savepath)[1]
       # URL末尾に拡張子が存在しない場合はhtmlファイルとして保存
       if ext == "":
@@ -54,7 +58,7 @@ def download_file(url):
       time.sleep(1)
       return savepath
    except:
-      print("ダウンロード失敗:", url)
+      log.warning("ダウンロード失敗:" + url)
       return None
 
 def analize_html(url, root_url):
@@ -62,7 +66,7 @@ def analize_html(url, root_url):
    if savepath is None: return
    if savepath in test_files: return
    test_files[savepath] = True
-   print("analize_html=", url)
+   log.info("analize_html=" + url)
 
    if const.DL_ROOT_NAME in url:
        with open(os.path.abspath(url), mode='rb') as f:
@@ -102,14 +106,11 @@ if __name__ == "__main__":
    f = csv.DictReader(csv_file)
    for row in f:
        if row["TargetFlag"] == "1":
-           # テスト計測用(※あとで消す)
+           log.info("【" + row["LocalGovernmentName"] + "】")
            start = time.time()
            url = row["URL"]
            url_convert(url)
-           # ドメイン名までをルートURLとする
-           #root_url = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(url))
            # 階層パスまでをルートURLとする
            root_url = os.path.dirname(url)
            analize_html(url, root_url)
-           # テスト計測用(※あとで消す)
-           print(row["LocalGovernmentName"] + ":" + str(time.time()-start))
+           log.debug("実行時間:" + row["LocalGovernmentName"] + ":" + str(time.time()-start))
