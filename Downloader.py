@@ -10,6 +10,7 @@ import requests
 import cchardet
 import const
 import csv
+import traceback
 
 import logging_config
 from logging import getLogger
@@ -46,6 +47,7 @@ def download_file(url):
       try:
           makedirs(savedir)
       except FileNotFoundError:
+          traceback.print_exc()
           log.warning("ディレクトリ作成失敗:" + savedir)
 
    try:
@@ -58,6 +60,7 @@ def download_file(url):
       time.sleep(1)
       return savepath
    except:
+      traceback.print_exc()
       log.warning("ダウンロード失敗:" + url)
       return None
 
