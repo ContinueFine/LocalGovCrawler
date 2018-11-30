@@ -56,6 +56,9 @@ def download_file(url):
       # URL末尾に拡張子が存在しない場合はhtmlファイルとして保存
       if ext == "":
           savepath += ".html"
+      opener = urllib.request.build_opener()
+      opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+      urllib.request.install_opener(opener)
       urlretrieve(url, savepath)
       time.sleep(1)
       return savepath
@@ -110,10 +113,12 @@ if __name__ == "__main__":
    for row in f:
        if row["TargetFlag"] == "1":
            log.info("【" + row["LocalGovernmentName"] + "】")
+           sp = row["URL"].split("|")
            start = time.time()
-           url = row["URL"]
-           url_convert(url)
-           # 階層パスまでをルートURLとする
-           root_url = os.path.dirname(url)
-           analize_html(url, root_url)
+           for target_url in sp:
+              url = target_url
+              url_convert(url)
+              # 階層パスまでをルートURLとする
+              root_url = os.path.dirname(url)
+              analize_html(url, root_url)
            log.debug("実行時間:" + row["LocalGovernmentName"] + ":" + str(time.time()-start))
